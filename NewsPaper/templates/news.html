@@ -1,0 +1,74 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+ 
+{% block content %}
+   {{ users }}
+   {% if 'post_category=1' in request.get_full_path %}
+   {% if is_not_politics_sub %}
+   <button> <a href="subscribe_pol/">Subscribe</a> </button>
+   {% endif %}
+   <h1>Politics</h1>
+   {% elif 'post_category=2' in request.get_full_path %}
+   {% if is_not_music_sub %}
+   <button> <a href="subscribe_music/">Subscribe</a> </button>
+   {% endif %}
+   <h1>Music</h1>
+   {% elif 'post_category=3' in request.get_full_path %}
+   {% if is_not_sport_sub %}
+   <button> <a href="subscribe_sport/">Subscribe</a> </button>
+   {% endif %}
+   <h1>Sport</h1>
+   {% elif 'post_category=4' in request.get_full_path %}
+   {% if is_not_education_sub %}
+   <button> <a href="subscribe_edu/">Subscribe</a> </button>
+   {% endif %}
+   <h1>Education</h1>
+   {% else %}
+   <h1>All news</h1>
+   {% endif %}
+   <h3>{{ news|length }} news</h3>
+   <form action="" method="get">
+       {{ filterset.form.as_p }}
+       <input type="submit" value="Searh" />
+   </form>
+   <hr>
+   {% if news %}
+       <table>
+           <tr>
+               <td>Title</td>
+               <td>Date</td>
+               <td>Text</td>
+           </tr>
+           {% for post in news %}
+           <tr>
+               <td><a href="/news/{{post.id}}"> {{ post.name }} </a></td>
+               <td>{{ post.time|date:'d M Y' }}</td>
+               <td>{{ post.text|truncatechars:20 }}</td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>No news to display</h2>
+   {% endif %}
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {{ page_obj.number }}
+
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+{% endblock content %}
