@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import Group, User
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.core.cache import cache
 
 from .models import Post, Category
 from .filters import PostFilter, PostCategoryFilter
@@ -43,6 +44,15 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
+
+    def get_object(self, *args, **kwargs):
+        obj = cache.get(f'product-{self.kwargs["pk"]}',
+                        None)
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'product-{self.kwargs["pk"]}', obj)
+
+        return obj
 
 
 class SearchList(ListView):
